@@ -11,7 +11,7 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: #f6f7fb;
+  background: #fffbf4;
 }
 
 .card {
@@ -44,6 +44,17 @@ button {
   font-weight: 600;
 }
 
+.dropDown {
+  appearance: none;
+  border: 1px solid #d7dbea;
+  background: #111827;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 button:hover {
   opacity: 0.92;
 }
@@ -54,4 +65,46 @@ button:hover {
   border: 1px dashed #d7dbea;
   border-radius: 12px;
   min-height: 24px;
+}
+
+
+.segmented {
+  border: 0;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.segmented legend {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.segmented input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented label {
+  display: inline-block;
+  padding: 10px 14px;
+  border: 1px solid #d7dbea;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.segmented label:first-of-type {
+  border-radius: 10px 0 0 10px;
+}
+
+.segmented label:last-of-type {
+  border-radius: 0 10px 10px 0;
+  border-left: 0;
+}
+
+.segmented input[type="radio"]:checked + label {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
 }
