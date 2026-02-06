@@ -8,32 +8,22 @@
         <script defer src="./app.js"></script>
     </head>
     <body>
+        <h1>小毛宅狗狗旅館住宿費用試算系統</h1>
+        <fieldset>
+            <legend>請選擇住宿方案：</legend>
+            <input type="radio" name="planType" id="planA"/>
+            <label for="planA">方案 A</label>
+            
+            <input type="radio" name="planType" id="planB"/>
+            <label for="planB">方案 B</label>
+        </fieldset>
         
-        <!-- <main class="card">
-            <h1>小毛宅狗狗旅館住宿費用試算系統</h1>
-            <h2>請選擇住宿方案：</h2>
-
-            <fieldset class="segmented">
-                <legend>住宿方案</legend>
-
-                <input type="radio" id="planA" name="plan" value="A" />
-                <label for="planA">方案 A</label>
-
-                <input type="radio" id="planB" name="plan" value="B" />
-                <label for="planB">方案 B</label>
-            </fieldset>
-
-            <input type="date" name="dateOne" id="dateOne">
-            <input type="datetime-local" name="dateTime" id="dateTime">
-            <input type="time" name="timeOne" id="timeOne">
-
-            <button id="helloBtn" type="button">Click Me</button>
-            <select class="dropDown" id="dogWeight" name="dogWeight">
-                <option value="">Select...</option>
-                <option value="zeroToFive">Less than 5 kg</option>
-                <option value="fiveToTen">Between 5 and 10 kg</option>
-            </select>
-            <div class="result" id="result" aria-live="polite"></div>
-        </main> -->
+        <label for="dogSize">狗狗體重</label>
+        <select class="dropDown" name="dogSize" id="dogSize" required>
+            <option value="">請選擇</option>
+            <option value="small">5公斤以下</option>
+            <option value="medium">6-10公斤</option>
+            <option value="large">11-15公斤</option>
+        </select>
     </body>
 </html>

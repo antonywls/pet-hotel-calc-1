@@ -11,17 +11,36 @@ const hourlyRate = {
 }
 
 const state = {
-    planType:   "",
-    dogSize:    "",
+    planType:   "",     //"A" or "B"
+    dogSize:    "",     //"small" | "medium" | "large"
     startDate:  "",
     startTime:  "",
     endDate:    "",
     endTime:    "",
-    nights:     null,
-    hours:      null,
-
+    days:       null,   // number
+    overtime:   null,   // number (hours)
 }
 
+function calculateFinal(state) {
+    if(state.planType === "A"){
+        
+        return dailyRate[state.dogSize] * state.days;
+
+    } else if (state.planType === "B"){
+        
+        return (dailyRate[state.dogSize] * state.days)
+                + hourlyRate[state.dogSize] * state.overtime;
+
+    } else {
+        return null;
+    }
+}
+
+const planType = document.getElementsByName("planType");
+
+planType.addEventListener("change", ()=>{
+    
+});
 
 const helloBtn = document.getElementById("helloBtn");
 const result = document.getElementById("result");
