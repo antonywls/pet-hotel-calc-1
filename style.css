@@ -21,7 +21,16 @@ body {
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 8px 24px rgba(20, 20, 40, 0.08);
+
+  transition: box-shadow 100ms ease-in-out, transform 100ms ease-in-out, border-color 100ms ease-in-out;
 }
+
+.card:hover {
+  box-shadow: 0 12px 36px rgba(20, 20, 40, 0.14);
+  transform: translateY(-2px);
+  border-color: #d7dbea;
+}
+
 
 h1 {
   margin: 0 0 8px 0;
