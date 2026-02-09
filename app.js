@@ -21,6 +21,28 @@ const state = {
     overtime:   null,   // number (hours)
 }
 
+const priceForm = document.getElementById("priceForm");
+const dogSize = document.getElementById("dogSize");
+
+
+
+function updateForm(){
+    console.log("Updating form");
+    readState(state);
+    calculateFinal(state);
+    renderFinal(state);
+}
+
+function readState(state){
+    console.log("Reading/Updating state");
+
+    const planType = document.querySelector('input[name="planType"]:checked')?.value ?? "";
+    state.planType = planType;
+    console.log("   planType: " + state.planType);
+    state.dogSize = dogSize.value;
+    console.log("   dogSize: " + state.dogSize);
+}
+
 function calculateFinal(state) {
     if(state.planType === "A"){
         
@@ -36,25 +58,12 @@ function calculateFinal(state) {
     }
 }
 
-const planType = document.getElementsByName("planType");
+function renderFinal(state){
 
-planType.addEventListener("change", ()=>{
-    
-});
+}
 
-const helloBtn = document.getElementById("helloBtn");
-const result = document.getElementById("result");
 
-helloBtn.addEventListener("click", () => {
-  const msg = "Hello world — JS is working.";
-  //alert(msg);
-  result.textContent = msg;
-});
 
-helloBtn.addEventListener("mouseenter", () => {
-  result.textContent = "you are hovering";
-});
+priceForm.addEventListener("input", updateForm);
+priceForm.addEventListener("change", updateForm);
 
-helloBtn.addEventListener("mouseleave", () => {
-  result.textContent = "";
-});

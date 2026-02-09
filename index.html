@@ -9,21 +9,33 @@
     </head>
     <body>
         <h1>小毛宅狗狗旅館住宿費用試算系統</h1>
-        <fieldset>
-            <legend>請選擇住宿方案：</legend>
-            <input type="radio" name="planType" id="planA"/>
-            <label for="planA">方案 A</label>
-            
-            <input type="radio" name="planType" id="planB"/>
-            <label for="planB">方案 B</label>
-        </fieldset>
         
-        <label for="dogSize">狗狗體重</label>
-        <select class="dropDown" name="dogSize" id="dogSize" required>
-            <option value="">請選擇</option>
-            <option value="small">5公斤以下</option>
-            <option value="medium">6-10公斤</option>
-            <option value="large">11-15公斤</option>
-        </select>
+        <form id="priceForm">
+            <fieldset>
+                <legend>請選擇住宿方案：</legend>
+                <input type="radio" name="planType" id="planA" value="A"/>
+                <label for="planA">方案 A</label>
+                
+                <input type="radio" name="planType" id="planB" value="B"/>
+                <label for="planB">方案 B</label>
+            </fieldset>
+            <div>
+                <label for="dogSize">狗狗體重：</label>
+                <select class="dropDown" name="dogSize" id="dogSize" required>
+                    <option value="">請選擇</option>
+                    <option value="small">5公斤以下</option>
+                    <option value="medium">6-10公斤</option>
+                    <option value="large">11-15公斤</option>
+                </select>
+            </div>
+            <div>
+                <label for="startDate">入住日期：</label>
+                <input type="date" id="startDate"/>
+            </div>
+            <div>
+                <label for="endDate">退房日期：</label>
+                <input type="date" id="endDate"/>
+            </div>
+        </form>
     </body>
 </html>
