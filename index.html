@@ -28,18 +28,28 @@
                     <option value="large">11-15公斤</option>
                 </select>
             </div>
-            <div>
-                <label for="startDate">入住日期：</label>
-                <input type="date" id="startDate"/>
-                <label for="startTime">入住時間：</label>
-                <input type="time" id="startTime"/>
-            </div>
-            <div>
-                <label for="endDate">退房日期：</label>
-                <input type="date" id="endDate"/>
-                <label for="endTime">退房時間：</label>
-                <input type="time" id="endTime"/>
+            <div id="dateTimeSelection" class="hidden">
+                <div>
+                    <label for="startDate">入住日期：</label>
+                    <input type="date" id="startDate"/>
+                    <span id="startTimeSelection" class="hidden">
+                        <label for="startTime">入住時間：</label>
+                        <input type="time" id="startTime"/>
+                    </span>
+                </div>
+                <div>
+                    <label for="endDate">退房日期：</label>
+                    <input type="date" id="endDate"/>
+                    <span id="endTimeSelection" class="hidden">
+                        <label for="endTime">退房時間：</label>
+                        <input type="time" id="endTime"/>
+                    </span>
+                </div>
             </div>
         </form>
+        <div>
+            <div>本次住宿預估費用：</div>
+            <div id="finalPrice" >--</div>
+        </div>
     </body>
 </html>

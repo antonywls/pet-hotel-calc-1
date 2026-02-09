@@ -5,3 +5,7 @@
   line-height: 1.4;
   color-scheme: light;
 }
+
+.hidden{
+    display: none !important;
+}

@@ -26,24 +26,32 @@ const state = {
     overtime:       null,   // number hours
     normalOvertime: null,   // number hours
     doubleOvertime: null,   // number hours
+    finalPrice:     0,
 }
 
-let finalPrice = 0;
 
-const priceForm = document.getElementById("priceForm");
-const dogSize   = document.getElementById("dogSize");
-const startDate = document.getElementById("startDate");
-const startTime = document.getElementById("startTime");
-const endDate   = document.getElementById("endDate");
-const endTime   = document.getElementById("endTime");
+const priceForm         = document.getElementById("priceForm");
+const dogSize           = document.getElementById("dogSize");
+const startDate         = document.getElementById("startDate");
+const startTime         = document.getElementById("startTime");
+const endDate           = document.getElementById("endDate");
+const endTime           = document.getElementById("endTime");
+const finalPrice        = document.getElementById("finalPrice");
+const dateTimeSelection = document.getElementById("dateTimeSelection");
+const startTimeSelection     = document.getElementById("startTimeSelection");
+const endTimeSelection     = document.getElementById("endTimeSelection");
+
+
 
 function updateForm(){
     console.log("Updating form");
     updateState(state);
-    finalPrice = calculateFinal(state);
-    console.log("finalPrice: "+ finalPrice)
-    renderFinal(state);
+    state.finalPrice = calculateFinal(state);
+    console.log("finalPrice: "+ state.finalPrice)
+    renderFinal();
 }
+
+updateForm();
 
 function updateState(state){
     readInputs(state);
@@ -57,6 +65,16 @@ function readInputs(state){
 
     const planType = document.querySelector('input[name="planType"]:checked')?.value ?? "";
     state.planType = planType;
+    if(planType) dateTimeSelection.classList.remove("hidden");
+    else dateTimeSelection.classList.add("hidden");
+    if(planType === "B") {
+        startTimeSelection.classList.remove("hidden");
+        endTimeSelection.classList.remove("hidden");
+    }
+    else {
+        startTimeSelection.classList.add("hidden");
+        endTimeSelection.classList.add("hidden");
+    }
     console.log("   planType: " + state.planType);
     state.dogSize = dogSize.value;
     console.log("   dogSize: " + state.dogSize);
@@ -152,8 +170,12 @@ function calculateFinal(state) {
     return 0;
 }
 
-function renderFinal(state){
-
+function renderFinal(){
+    if(state.finalPrice == 0){
+        finalPrice.textContent = "--";
+    } else {
+        finalPrice.textContent = `$${state.finalPrice.toFixed(0)}`;
+    }
 }
 
 priceForm.addEventListener("input", updateForm);
