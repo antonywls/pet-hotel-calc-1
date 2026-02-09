@@ -1,3 +1,7 @@
+//24-hour format (hours), starting and ending time for double time rates at hourly overtime.
+const DoubleRateEndHour   = 9;
+const DoubleRateStartHour = 21;
+
 const dailyRate = {
     small :     700,
     medium :    800,
@@ -18,8 +22,10 @@ const state = {
     startTime:      "",
     endDate:        "",
     endTime:        "",
-    days:           null,   // number
-    overtime:       null,   // number (hours)
+    days:           null,   // number days
+    overtime:       null,   // number hours
+    normalOvertime: null,   // number hours
+    doubleOvertime: null,   // number hours
 }
 
 let finalPrice = 0;
@@ -35,6 +41,7 @@ function updateForm(){
     console.log("Updating form");
     updateState(state);
     finalPrice = calculateFinal(state);
+    console.log("finalPrice: "+ finalPrice)
     renderFinal(state);
 }
 
@@ -70,43 +77,79 @@ function parseDateTime(dateString, timeString = "00:00"){
     return new Date(y, m-1, d, hh || 0, mm || 0, 0, 0);
 }
 
+function parseMinutes(timeString){
+    const [hh, mm] = timeString.split(":").map(Number);
+    return hh * 60 + mm;
+}
+
+function calculateOvertime(state){
+    let startMinutes = parseMinutes(state.startTime);
+    let endMinutes   = parseMinutes(state.endTime);
+
+    if (startMinutes>endMinutes) endMinutes += 24*60;
+
+    const ov = (L, U) => Math.max(0, Math.min(endMinutes, U) - Math.max(startMinutes,L));
+
+    const doubleTimeMinutes = ov(0, DoubleRateEndHour*60) 
+         + ov(DoubleRateStartHour*60, (DoubleRateEndHour+24)*60)
+         + ov((DoubleRateStartHour+24)*60, 48*60);
+
+    state.doubleOvertime = Math.ceil(doubleTimeMinutes/30) / 2;
+    
+    state.overtime = Math.ceil((endMinutes-startMinutes)/30) / 2;
+    
+    state.normalOvertime = state.overtime-state.doubleOvertime;
+    
+    console.log("   overtime:" + state.overtime);
+    console.log("   normalOvertime:" + state.normalOvertime);
+    console.log("   doubleOvertime:" + state.doubleOvertime);
+
+
+}
+
 function calculateDuration(state){
     const dayMs = 86400000;
-    const hourMs = 3600000;
-    
-    const startMidnight = parseDateTime(state.startDate);
-    const endMidnight   = parseDateTime(state.endDate);
-    
+
     if(state.planType === 'A' && state.startDate != "" && state.endDate != ""){
-        state.overtime = 0;
+        state.overtime       = 0;
+        state.normalOvertime = 0;
+        state.doubleOvertime = 0;
+        const startMidnight = parseDateTime(state.startDate);
+        const endMidnight   = parseDateTime(state.endDate);
         state.days =  Math.max(0, Math.round((endMidnight-startMidnight)/dayMs)+1);
     }
     
     else if(state.planType === 'B' && state.startDate != "" && state.endDate != "" && state.startTime != "" && state.endTime != ""){
         const start = parseDateTime(state.startDate, state.startTime);
         const end   = parseDateTime(state.endDate, state.endTime);
-        const diffMS = end - start;
-        const state.days = Math.floor
-
+        const diffMs = Math.max(0, end - start);
+        state.days = Math.floor(diffMs / dayMs);
+        calculateOvertime(state);
     }
 
     console.log("   days: " + state.days);
     console.log("   overtime: " + state.overtime);
+    console.log("   normalOvertime: " + state.normalOvertime);
+    console.log("   doubleOvertime: " + state.doubleOvertime);
 }
 
 function calculateFinal(state) {
-    if(state.planType === "A"){
-        
-        return dailyRate[state.dogSize] * state.days;
-
-    } else if (state.planType === "B"){
-        
-        return (dailyRate[state.dogSize] * state.days)
-                + hourlyRate[state.dogSize] * state.overtime;
-
-    } else {
-        return null;
+    
+    if(!state.planType || !state.dogSize || !state.startDate || !state.endDate){
+        return 0;
     }
+
+    if(state.planType === "A"){
+        return dailyRate[state.dogSize] * state.days;
+    }
+
+    if (state.planType === "B" && state.startTime && state.endTime){
+        return (dailyRate[state.dogSize] * state.days)
+            + Math.min(dailyRate[state.dogSize],hourlyRate[state.dogSize] * state.normalOvertime
+            + hourlyRate[state.dogSize] * 2 * state.doubleOvertime);
+    } 
+    
+    return 0;
 }
 
 function renderFinal(state){
