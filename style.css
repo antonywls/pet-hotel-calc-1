@@ -1,11 +1,238 @@
 /* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
 :root {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+  font-family: 'Lato', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
     "Segoe UI Emoji";
-  line-height: 1.4;
+  line-height: 1.6;
   color-scheme: light;
 }
 
-.hidden{
-    display: none !important;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: white;
+  min-height: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 300; /* Lato Light */
+}
+
+h1 {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 400; /* Lato Regular for headings */
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+#priceForm {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 20px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+fieldset {
+  border: none;
+  margin-bottom: 1.5rem;
+  padding: 0;
+}
+
+legend {
+  color: #34495e;
+  font-weight: 400; /* Lato Regular */
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+/* Radio buttons styling */
+input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+input[type="radio"]:hover {
+  border-color: #7f6001;
+}
+
+input[type="radio"]:checked {
+  border-color: #7f6001;
+  background: #7f6001;
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+label[for="planA"],
+label[for="planB"] {
+  cursor: pointer;
+  margin-right: 1.5rem;
+  color: #34495e;
+  font-weight: 400; /* Lato Regular */
+  transition: color 0.2s ease;
+  vertical-align: middle;
+}
+
+label[for="planA"]:hover,
+label[for="planB"]:hover {
+  color: #7f6001;
+}
+
+/* Form groups */
+#priceForm > div {
+  margin-bottom: 1.5rem;
+}
+
+#priceForm > div > label {
+  display: block;
+  color: #34495e;
+  font-weight: 400; /* Lato Regular */
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+/* Dropdown styling */
+.dropDown {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2c3e50;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropDown:hover {
+  border-color: #7f6001;
+}
+
+.dropDown:focus {
+  outline: none;
+  border-color: #7f6001;
+  box-shadow: 0 0 0 3px rgba(127, 96, 1, 0.1);
+}
+
+/* Date and time inputs */
+#dateTimeSelection > div {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#dateTimeSelection label {
+  color: #34495e;
+  font-weight: 400; /* Lato Regular */
+  font-size: 0.95rem;
+}
+
+input[type="date"],
+input[type="time"] {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2c3e50;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+input[type="date"]:hover,
+input[type="time"]:hover {
+  border-color: #7f6001;
+}
+
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: #7f6001;
+  box-shadow: 0 0 0 3px rgba(127, 96, 1, 0.1);
+}
+
+#startTimeSelection,
+#endTimeSelection {
+  margin-top: 0.5rem;
+}
+
+/* Price display */
+body > div:last-child {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 20px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+body > div:last-child > div:first-child {
+  color: #7f8c8d;
+  font-size: 0.95rem;
+  font-weight: 400; /* Lato Regular */
+  margin-bottom: 0.75rem;
+}
+
+#finalPrice {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #7f6001;
+  letter-spacing: -1px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  body {
+    padding: 1rem 0.75rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  #priceForm {
+    padding: 1.5rem;
+  }
+  
+  body > div:last-child {
+    padding: 1.5rem;
+  }
+  
+  #finalPrice {
+    font-size: 2rem;
+  }
 }
