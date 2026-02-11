@@ -143,6 +143,9 @@ function calculateDuration(state){
     else if(state.planType === 'B' && state.startDate != "" && state.endDate != "" && state.startTime != "" && state.endTime != ""){
         const start = parseDateTime(state.startDate, state.startTime);
         const end   = parseDateTime(state.endDate, state.endTime);
+        
+        if(start>end) state.inputsValid = false;
+        
         const diffMs = Math.max(0, end - start);
         state.days = Math.floor(diffMs / dayMs);
         calculateOvertime(state);
