@@ -127,13 +127,16 @@ function calculateOvertime(state){
 
 function calculateDuration(state){
     const dayMs = 86400000;
+    
+    const startMidnight = parseDateTime(state.startDate);
+    const endMidnight   = parseDateTime(state.endDate);
+
+    if(startMidnight>endMidnight) state.inputsValid = false;
 
     if(state.planType === 'A' && state.startDate != "" && state.endDate != ""){
         state.overtime       = 0;
         state.normalOvertime = 0;
         state.doubleOvertime = 0;
-        const startMidnight = parseDateTime(state.startDate);
-        const endMidnight   = parseDateTime(state.endDate);
         state.days =  Math.max(0, Math.round((endMidnight-startMidnight)/dayMs)+1);
     }
     
@@ -171,7 +174,7 @@ function calculateFinal(state) {
 }
 
 function renderFinal(){
-    if(state.finalPrice == 0){
+    if(state.finalPrice == 0 || !state.inputsValid){
         finalPrice.textContent = "--";
     } else {
         finalPrice.textContent = `$${state.finalPrice.toFixed(0)}`;
