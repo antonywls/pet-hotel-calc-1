@@ -243,7 +243,7 @@ function calculateDuration(){
 
 function calculateFinal() {
     
-    if(!state.planType || !state.dogSize || !state.startDate || !state.endDate){
+    if(!state.planType || !state.dogSize || !state.startDate || !state.endDate || !state.inputsValid){
         return 0;
     }
 
