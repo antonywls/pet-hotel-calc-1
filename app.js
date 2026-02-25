@@ -1,17 +1,22 @@
-const OpeningHour  = 10;
-const ClosingHour  = 20;
-const BufferTime   = 1;
-const OvernightPivot = 3;
+// ── Pricing constants (edit here) ──────────────────────────────
+const OpeningHour    = 10;
+const ClosingHour    = 20;     // Must be before midnight
+const BufferTime     = 1;      // Hours after closing / before opening with single (not double) rate
+const OvernightPivot = 3;      // If overtime crosses this hour it counts as an extra day
 
-const dailyRate = { small: 700, medium: 800, large: 1000 };
-const hourlyRate = { small: 100, medium: 120, large: 150 };
+const dailyRate  = { small: 700,  medium: 800,  large: 1000 };
+const hourlyRate = { small: 100,  medium: 120,  large: 150  };
+
+const walkPrice  = 100;   // Per walk, per dog
+const sleepPrice = 500;   // Per night, per dog (companion sleep-over)
+// ────────────────────────────────────────────────────────────────
 
 const sizeLabel = { small: "5公斤以下", medium: "6-10公斤", large: "11-15公斤" };
 
 const state = {
   inputsValid: true,
   planType: "",
-  dogSizes: ["small"],  // array of sizes per dog
+  dogs: [],          // [{ size, walks, sleeps }]
   startDate: "", startTime: "", endDate: "", endTime: "",
   startHour: null, endHour: null,
   days: null,
@@ -24,123 +29,158 @@ const state = {
   finalPrice: 0,
 };
 
-// Combined rates (sum across all dogs)
+// Combined base rates (sum across all dogs, excluding add-ons)
 function getCombinedRates() {
   let daily = 0, hourly = 0;
-  for (const size of state.dogSizes) {
-    if (size) { daily += dailyRate[size]; hourly += hourlyRate[size]; }
+  for (const d of state.dogs) {
+    if (d.size) { daily += dailyRate[d.size]; hourly += hourlyRate[d.size]; }
   }
   return { daily, hourly };
 }
 
-// DOM refs
+// ── DOM refs ───────────────────────────────────────────────────
 const priceForm          = document.getElementById("priceForm");
 const dogCountEl         = document.getElementById("dogCount");
 const dogSizesContainer  = document.getElementById("dogSizesContainer");
-const startDate          = document.getElementById("startDate");
-const startTime          = document.getElementById("startTime");
-const endDate            = document.getElementById("endDate");
-const endTime            = document.getElementById("endTime");
+const startDateEl        = document.getElementById("startDate");
+const startTimeEl        = document.getElementById("startTime");
+const endDateEl          = document.getElementById("endDate");
+const endTimeEl          = document.getElementById("endTime");
 const finalPriceEl       = document.getElementById("finalPrice");
 const dateTimeSelection  = document.getElementById("dateTimeSelection");
 const startTimeSelection = document.getElementById("startTimeSelection");
 const endTimeSelection   = document.getElementById("endTimeSelection");
 const breakdownEl        = document.getElementById("breakdown");
+const cardA              = document.getElementById("cardA");
+const cardB              = document.getElementById("cardB");
 
-// Render dog size selectors
-function renderDogSizeSelectors() {
+// ── Dog cards renderer ─────────────────────────────────────────
+function renderDogCards() {
   const count = parseInt(dogCountEl.value) || 1;
-  // Preserve existing selections
-  const prev = state.dogSizes.slice();
-  state.dogSizes = Array.from({ length: count }, (_, i) => prev[i] || "small");
+  const prev  = state.dogs.slice();
+  state.dogs  = Array.from({ length: count }, (_, i) => ({
+    size:   prev[i]?.size  ?? "small",
+    walks:  prev[i]?.walks  ?? 0,
+    sleeps: prev[i]?.sleeps ?? 0,
+  }));
 
   dogSizesContainer.innerHTML = "";
+
   for (let i = 0; i < count; i++) {
-    const row = document.createElement("div");
-    row.className = "dog-size-row";
+    const dog  = state.dogs[i];
+    const card = document.createElement("div");
+    card.className = "dog-card";
+    card.innerHTML = `
+      <div class="dog-card-title">${count === 1 ? "🐶 狗狗資訊" : `🐶 第 ${i + 1} 隻`}</div>
 
-    const label = document.createElement("label");
-    label.setAttribute("for", `dogSize_${i}`);
-    label.textContent = count === 1 ? "狗狗體重：" : `第 ${i + 1} 隻：`;
+      <div class="dog-card-row">
+        <label for="dogSize_${i}">體重：</label>
+        <select id="dogSize_${i}" name="dogSize_${i}">
+          <option value="small"  ${dog.size==="small"  ? "selected" : ""}>5公斤以下</option>
+          <option value="medium" ${dog.size==="medium" ? "selected" : ""}>6-10公斤</option>
+          <option value="large"  ${dog.size==="large"  ? "selected" : ""}>11-15公斤</option>
+        </select>
+      </div>
 
-    const select = document.createElement("select");
-    select.className = "dropDown";
-    select.id = `dogSize_${i}`;
-    select.name = `dogSize_${i}`;
-    select.innerHTML = `
-      <option value="small">5公斤以下</option>
-      <option value="medium">6-10公斤</option>
-      <option value="large">11-15公斤</option>
+      <div class="dog-card-row">
+        <div class="addon-row">
+          <span class="addon-label">
+            🦮 散步
+            <span class="addon-price-tag">+$${walkPrice}/次</span>
+          </span>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-dog="${i}" data-type="walks" data-delta="-1">−</button>
+            <span class="qty-display" id="walks_${i}">${dog.walks}</span>
+            <button type="button" class="qty-btn" data-dog="${i}" data-type="walks" data-delta="1">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dog-card-row">
+        <div class="addon-row">
+          <span class="addon-label">
+            🌙 陪睡
+            <span class="addon-price-tag">+$${sleepPrice}/晚</span>
+          </span>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-dog="${i}" data-type="sleeps" data-delta="-1">−</button>
+            <span class="qty-display" id="sleeps_${i}">${dog.sleeps}</span>
+            <button type="button" class="qty-btn" data-dog="${i}" data-type="sleeps" data-delta="1">+</button>
+          </div>
+        </div>
+      </div>
     `;
-    select.value = state.dogSizes[i];
-
-    row.appendChild(label);
-    row.appendChild(select);
-    dogSizesContainer.appendChild(row);
+    dogSizesContainer.appendChild(card);
   }
 }
 
+// ── Qty buttons (event delegation) ────────────────────────────
+dogSizesContainer.addEventListener("click", e => {
+  const btn = e.target.closest(".qty-btn");
+  if (!btn) return;
+  const i     = parseInt(btn.dataset.dog);
+  const type  = btn.dataset.type;   // "walks" | "sleeps"
+  const delta = parseInt(btn.dataset.delta);
+  state.dogs[i][type] = Math.max(0, state.dogs[i][type] + delta);
+  document.getElementById(`${type}_${i}`).textContent = state.dogs[i][type];
+  recalcAndRender();
+});
+
+// ── Read size dropdowns into state ────────────────────────────
 function readDogSizes() {
-  const count = parseInt(dogCountEl.value) || 1;
-  state.dogSizes = [];
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < state.dogs.length; i++) {
     const el = document.getElementById(`dogSize_${i}`);
-    state.dogSizes.push(el ? el.value : "small");
+    if (el) state.dogs[i].size = el.value;
   }
 }
 
-function parseDateTime(dateString, timeString = "00:00") {
-  const [y, m, d] = dateString.split("-").map(Number);
-  const [hh, mm] = timeString.split(":").map(Number);
+// ── Helpers ───────────────────────────────────────────────────
+function parseDateTime(dateStr, timeStr = "00:00") {
+  const [y, m, d]   = dateStr.split("-").map(Number);
+  const [hh, mm]    = timeStr.split(":").map(Number);
   return new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
 }
-
-function parseMinutes(timeString) {
-  const [hh, mm] = timeString.split(":").map(Number);
+function parseMinutes(t) {
+  const [hh, mm] = t.split(":").map(Number);
   return hh * 60 + mm;
 }
-
-function parseHours(timeString) {
-  if (!timeString) return 0;
-  const [hh, mm] = timeString.split(":").map(Number);
+function parseHours(t) {
+  if (!t) return 0;
+  const [hh, mm] = t.split(":").map(Number);
   return hh + mm / 60;
 }
 
+// ── Calculation helpers ───────────────────────────────────────
 function calculateOvertime() {
   const { daily, hourly } = getCombinedRates();
-  let startMinutes = parseMinutes(state.startTime);
-  let endMinutes   = parseMinutes(state.endTime);
-  if (startMinutes > endMinutes) endMinutes += 24 * 60;
+  let sm = parseMinutes(state.startTime);
+  let em = parseMinutes(state.endTime);
+  if (sm > em) em += 24 * 60;
 
-  const ov = (L, U) => Math.max(0, Math.min(endMinutes, U) - Math.max(startMinutes, L));
-
-  const zeroedMinutes = ov(0, OpeningHour * 60)
+  const ov = (L, U) => Math.max(0, Math.min(em, U) - Math.max(sm, L));
+  const zeroedMin = ov(0, OpeningHour * 60)
     + ov(ClosingHour * 60, (OpeningHour + 24) * 60)
     + ov((ClosingHour + 24) * 60, 48 * 60);
 
-  state.overtime.zeroed = Math.ceil(zeroedMinutes / 30) / 2;
-  state.overtime.normal = Math.ceil((endMinutes - startMinutes - zeroedMinutes) / 30) / 2;
+  state.overtime.zeroed = Math.ceil(zeroedMin / 30) / 2;
+  state.overtime.normal = Math.ceil((em - sm - zeroedMin) / 30) / 2;
   state.overtime.base   = state.overtime.zeroed + state.overtime.normal;
-
   state.overtime.countsAsExtraDay =
     state.overtime.normal * hourly >= daily
     || (state.startHour > state.endHour && state.endHour >= OvernightPivot);
 }
 
-function calculateSingleOffBusiness(contactHour) {
-  if (contactHour >= OpeningHour && contactHour <= ClosingHour)
-    return { base: 0, buffer: 0, double: 0 };
-
-  let adj = contactHour;
-  if (adj < ClosingHour) adj += 24;
+function calcSingleOffBusiness(h) {
+  if (h >= OpeningHour && h <= ClosingHour) return { base: 0, buffer: 0, double: 0 };
+  let adj = h; if (adj < ClosingHour) adj += 24;
   const openAdj = OpeningHour + 24;
-  const currentBase = Math.ceil(Math.min(openAdj - adj, adj - ClosingHour) * 2) / 2;
-  return { base: currentBase, buffer: Math.min(currentBase, BufferTime), double: Math.max(currentBase - BufferTime, 0) };
+  const base = Math.ceil(Math.min(openAdj - adj, adj - ClosingHour) * 2) / 2;
+  return { base, buffer: Math.min(base, BufferTime), double: Math.max(base - BufferTime, 0) };
 }
 
 function calculateOffBusiness() {
-  state.offBusiness.dropOff = calculateSingleOffBusiness(state.startHour);
-  state.offBusiness.pickUp  = calculateSingleOffBusiness(state.endHour);
+  state.offBusiness.dropOff = calcSingleOffBusiness(state.startHour);
+  state.offBusiness.pickUp  = calcSingleOffBusiness(state.endHour);
   state.offBusiness.total   = {
     base:   state.offBusiness.dropOff.base   + state.offBusiness.pickUp.base,
     buffer: state.offBusiness.dropOff.buffer + state.offBusiness.pickUp.buffer,
@@ -150,89 +190,108 @@ function calculateOffBusiness() {
 
 function calculateDuration() {
   const dayMs = 86400000;
-  const startMidnight = parseDateTime(state.startDate);
-  const endMidnight   = parseDateTime(state.endDate);
-
-  if (startMidnight > endMidnight) state.inputsValid = false;
+  const sm = parseDateTime(state.startDate);
+  const em = parseDateTime(state.endDate);
+  if (sm > em) state.inputsValid = false;
 
   if (state.planType === 'A' && state.startDate && state.endDate) {
     state.overtime = { countsAsExtraDay: false, base: 0, zeroed: 0, normal: 0 };
-    const empty = { base: 0, buffer: 0, double: 0 };
-    state.offBusiness = { dropOff: empty, pickUp: empty, total: empty };
-    state.days = Math.max(0, Math.round((endMidnight - startMidnight) / dayMs) + 1);
+    const z = { base: 0, buffer: 0, double: 0 };
+    state.offBusiness = { dropOff: z, pickUp: z, total: z };
+    state.days = Math.max(0, Math.round((em - sm) / dayMs) + 1);
   } else if (state.planType === 'B' && state.startDate && state.endDate && state.startTime && state.endTime) {
-    const start = parseDateTime(state.startDate, state.startTime);
-    const end   = parseDateTime(state.endDate, state.endTime);
-    if (start > end) state.inputsValid = false;
-    state.days = Math.floor(Math.max(0, end - start) / dayMs);
+    const s = parseDateTime(state.startDate, state.startTime);
+    const e = parseDateTime(state.endDate, state.endTime);
+    if (s > e) state.inputsValid = false;
+    state.days = Math.floor(Math.max(0, e - s) / dayMs);
     calculateOvertime();
     calculateOffBusiness();
   }
 }
 
+// Add-on totals
+function getAddonTotals() {
+  let totalWalks = 0, totalSleeps = 0;
+  for (const d of state.dogs) { totalWalks += d.walks; totalSleeps += d.sleeps; }
+  return { totalWalks, totalSleeps };
+}
+
 function calculateFinal() {
-  if (!state.planType || !state.dogSizes.every(s => s) || !state.startDate || !state.endDate || !state.inputsValid)
+  if (!state.planType || !state.dogs.every(d => d.size) || !state.startDate || !state.endDate || !state.inputsValid)
     return 0;
 
   const { daily, hourly } = getCombinedRates();
+  const { totalWalks, totalSleeps } = getAddonTotals();
+  const addonCost = totalWalks * walkPrice + totalSleeps * sleepPrice;
 
-  if (state.planType === "A") return daily * state.days;
-
+  if (state.planType === "A") {
+    return daily * state.days + addonCost;
+  }
   if (state.planType === "B" && state.startTime && state.endTime) {
     let total = daily * state.days
       + state.offBusiness.total.buffer * hourly
       + state.offBusiness.total.double * hourly * 2;
     if (state.overtime.countsAsExtraDay) total += daily;
     else total += state.overtime.normal * hourly;
-    return total;
+    return total + addonCost;
   }
   return 0;
 }
 
+// ── Breakdown renderer ─────────────────────────────────────────
 function fmt(n) { return `$${n.toFixed(0)}`; }
 
 function renderBreakdown() {
   if (state.finalPrice === 0 || !state.inputsValid) {
-    breakdownEl.classList.add("hidden");
-    return;
+    breakdownEl.classList.add("hidden"); return;
   }
 
   const { daily, hourly } = getCombinedRates();
-  const count = state.dogSizes.length;
-  const rows = [];
+  const count = state.dogs.length;
+  const rows  = [];
 
-  // Dog rate summary
+  // Rate summary
   if (count > 1) {
-    rows.push({ label: "住宿費率（合計）", value: `${fmt(daily)}/天　${fmt(hourly)}/時`, sub: false });
+    rows.push({ label: "住宿費率（合計）", value: `${fmt(daily)}/天　${fmt(hourly)}/時` });
     for (let i = 0; i < count; i++) {
-      const sz = state.dogSizes[i];
-      rows.push({ label: `第 ${i + 1} 隻（${sizeLabel[sz]}）`, value: `${fmt(dailyRate[sz])}/天　${fmt(hourlyRate[sz])}/時`, sub: true });
+      const sz = state.dogs[i].size;
+      rows.push({ label: `第 ${i+1} 隻（${sizeLabel[sz]}）`, value: `${fmt(dailyRate[sz])}/天　${fmt(hourlyRate[sz])}/時`, sub: true });
     }
   } else {
-    const sz = state.dogSizes[0];
-    rows.push({ label: `狗狗體型（${sizeLabel[sz]}）`, value: `${fmt(daily)}/天　${fmt(hourly)}/時`, sub: false });
+    const sz = state.dogs[0].size;
+    rows.push({ label: `狗狗體型（${sizeLabel[sz]}）`, value: `${fmt(daily)}/天　${fmt(hourly)}/時` });
   }
 
   // Plan A
   if (state.planType === "A") {
-    rows.push({ label: `住宿天數 × ${state.days} 天`, value: fmt(daily * state.days), sub: false });
+    rows.push({ label: `基本住宿 × ${state.days} 天`, value: fmt(daily * state.days) });
   }
 
   // Plan B
   if (state.planType === "B") {
-    rows.push({ label: `基本住宿 × ${state.days} 天`, value: fmt(daily * state.days), sub: false });
-
+    rows.push({ label: `基本住宿 × ${state.days} 晚`, value: fmt(daily * state.days) });
     if (state.overtime.countsAsExtraDay) {
-      rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily), sub: false });
+      rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily) });
     } else if (state.overtime.normal > 0) {
-      rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly), sub: false });
+      rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
     }
+    if (state.offBusiness.total.buffer > 0)
+      rows.push({ label: `非營業附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly) });
+    if (state.offBusiness.total.double > 0)
+      rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) });
+  }
 
-    if (state.offBusiness.total.buffer > 0) {
-      rows.push({ label: `非營業時間附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly), sub: false });
-    }
-    if (state.offBusiness.total.double > 0) {
-      rows.push({ label: `非營業時間附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2), sub: false });
+  // Add-ons per dog
+  const hasAddons = state.dogs.some(d => d.walks > 0 || d.sleeps > 0);
+  if (hasAddons) {
+    rows.push({ label: "加購服務", value: "" });
+    for (let i = 0; i < count; i++) {
+      const d = state.dogs[i];
+      const label = count === 1 ? "" : `第 ${i+1} 隻　`;
+      if (d.walks > 0)
+        rows.push({ label: `${label}🦮 散步 × ${d.walks} 次`, value: fmt(d.walks * walkPrice), sub: true });
+      if (d.sleeps > 0)
+        rows.push({ label: `${label}🌙 陪睡 × ${d.sleeps} 晚`, value: fmt(d.sleeps * sleepPrice), sub: true });
     }
   }
 
@@ -240,34 +299,46 @@ function renderBreakdown() {
 
   breakdownEl.innerHTML = `<div class="breakdown-title">費用明細</div>` +
     rows.map(r => `<div class="breakdown-row${r.sub ? " sub" : ""}${r.total ? " total-row" : ""}">
-      <span>${r.label}</span>
-      <span class="breakdown-value">${r.value}</span>
+      <span>${r.label}</span>${r.value ? `<span class="breakdown-value">${r.value}</span>` : ""}
     </div>`).join("");
 
   breakdownEl.classList.remove("hidden");
 }
 
+// ── Plan card highlight ────────────────────────────────────────
+function updatePlanCards() {
+  cardA.classList.toggle("selected", state.planType === "A");
+  cardB.classList.toggle("selected", state.planType === "B");
+}
+
+// ── Main update ───────────────────────────────────────────────
 function readInputs() {
   state.inputsValid = true;
   state.overtime.countsAsExtraDay = false;
-  state.planType = document.querySelector('input[name="planType"]:checked')?.value ?? "";
+  state.planType  = document.querySelector('input[name="planType"]:checked')?.value ?? "";
   readDogSizes();
-  state.startDate = startDate.value;
-  state.startTime = startTime.value;
-  state.endDate   = endDate.value;
-  state.endTime   = endTime.value;
+  state.startDate = startDateEl.value;
+  state.startTime = startTimeEl.value;
+  state.endDate   = endDateEl.value;
+  state.endTime   = endTimeEl.value;
   state.startHour = parseHours(state.startTime);
   state.endHour   = parseHours(state.endTime);
 }
 
-function updateForm() {
-  readInputs();
+function recalcAndRender() {
   calculateDuration();
   state.finalPrice = calculateFinal();
   renderFinal();
 }
 
+function updateForm() {
+  readInputs();
+  recalcAndRender();
+}
+
 function renderFinal() {
+  updatePlanCards();
+
   if (state.planType) dateTimeSelection.classList.remove("hidden");
   else dateTimeSelection.classList.add("hidden");
 
@@ -279,23 +350,21 @@ function renderFinal() {
     endTimeSelection.classList.add("hidden");
   }
 
-  if (state.finalPrice === 0 || !state.inputsValid) {
-    finalPriceEl.textContent = "--";
-  } else {
-    finalPriceEl.textContent = `$${state.finalPrice.toFixed(0)}`;
-  }
+  finalPriceEl.textContent = (state.finalPrice > 0 && state.inputsValid)
+    ? `$${state.finalPrice.toFixed(0)}`
+    : "--";
 
   renderBreakdown();
 }
 
-// Init dog size selectors
-renderDogSizeSelectors();
+// ── Init ──────────────────────────────────────────────────────
+renderDogCards();
 updateForm();
 
 dogCountEl.addEventListener("change", () => {
-  renderDogSizeSelectors();
+  renderDogCards();
   updateForm();
 });
 
-priceForm.addEventListener("input", updateForm);
+priceForm.addEventListener("input",  updateForm);
 priceForm.addEventListener("change", updateForm);
