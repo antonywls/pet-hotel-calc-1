@@ -59,6 +59,57 @@ legend {
   font-size: 1rem;
 }
 
+/* ── Included services ── */
+.included-services {
+  background: var(--gold-light);
+  border: 1px solid var(--gold-border);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+}
+
+.included-services-title {
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.45rem;
+  font-size: 0.88rem;
+}
+
+.included-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.included-list li {
+  padding-left: 1rem;
+  position: relative;
+  margin-bottom: 0.15rem;
+  line-height: 1.5;
+}
+
+.included-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+}
+
+/* ── Senior dog notice ── */
+.senior-dog-notice {
+  background: #fdf8f0;
+  border: 1px solid #e8d5a3;
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  font-weight: 400;
+}
+
 /* ── Plan cards ── */
 .plan-cards {
   display: grid;

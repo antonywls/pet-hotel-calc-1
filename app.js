@@ -74,7 +74,7 @@ function renderDogCards() {
       <div class="dog-card-title">${count === 1 ? "🐶 狗狗資訊" : `🐶 第 ${i + 1} 隻`}</div>
 
       <div class="dog-card-row">
-        <label for="dogSize_${i}">體重：</label>
+        <label for="dogSize_${i}">⚖️ 體重：</label>
         <select id="dogSize_${i}" name="dogSize_${i}">
           <option value="small"  ${dog.size==="small"  ? "selected" : ""}>5公斤以下</option>
           <option value="medium" ${dog.size==="medium" ? "selected" : ""}>6-10公斤</option>
