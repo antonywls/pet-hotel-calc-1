@@ -4,14 +4,14 @@ const ClosingHour    = 20;     // Must be before midnight
 const BufferTime     = 1;      // Hours after closing / before opening with single (not double) rate
 const OvernightPivot = 3;      // If overtime crosses this hour it counts as an extra day
 
-const dailyRate  = { small: 700,  medium: 800,  large: 1000 };
-const hourlyRate = { small: 100,  medium: 120,  large: 150  };
+const dailyRate  = { small: 700,  medium: 800,  large: 1000, xlarge: 1200, xxlarge: 1500 };
+const hourlyRate = { small: 100,  medium: 120,  large: 150,  xlarge: 180,  xxlarge: 200  };
 
 const walkPrice  = 100;   // Per walk, per dog
 const sleepPrice = 500;   // Per night, per dog (companion sleep-over)
 // ────────────────────────────────────────────────────────────────
 
-const sizeLabel = { small: "5公斤以下", medium: "6-10公斤", large: "11-15公斤" };
+const sizeLabel = { small: "5公斤以下", medium: "6-10公斤", large: "11-15公斤", xlarge: "16-20公斤", xxlarge: "21公斤以上" };
 
 const state = {
   inputsValid: true,
@@ -76,9 +76,11 @@ function renderDogCards() {
       <div class="dog-card-row">
         <label for="dogSize_${i}">⚖️ 體重：</label>
         <select id="dogSize_${i}" name="dogSize_${i}">
-          <option value="small"  ${dog.size==="small"  ? "selected" : ""}>5公斤以下</option>
-          <option value="medium" ${dog.size==="medium" ? "selected" : ""}>6-10公斤</option>
-          <option value="large"  ${dog.size==="large"  ? "selected" : ""}>11-15公斤</option>
+          <option value="small"   ${dog.size==="small"   ? "selected" : ""}>5公斤以下</option>
+          <option value="medium"  ${dog.size==="medium"  ? "selected" : ""}>6-10公斤</option>
+          <option value="large"   ${dog.size==="large"   ? "selected" : ""}>11-15公斤</option>
+          <option value="xlarge"  ${dog.size==="xlarge"  ? "selected" : ""}>16-20公斤</option>
+          <option value="xxlarge" ${dog.size==="xxlarge" ? "selected" : ""}>21公斤以上</option>
         </select>
       </div>
 
@@ -264,21 +266,32 @@ function renderBreakdown() {
 
   // Plan A
   if (state.planType === "A") {
+    rows.push({ label: "寄宿費用", sectionHead: true });
     rows.push({ label: `基本住宿 × ${state.days} 天`, value: fmt(daily * state.days) });
   }
 
   // Plan B
   if (state.planType === "B") {
+    rows.push({ label: "寄宿費用", sectionHead: true });
     rows.push({ label: `基本住宿 × ${state.days} 晚`, value: fmt(daily * state.days) });
-    if (state.overtime.countsAsExtraDay) {
-      rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily) });
-    } else if (state.overtime.normal > 0) {
-      rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
+
+    const hasHourly = state.overtime.countsAsExtraDay
+      || state.overtime.normal > 0
+      || state.offBusiness.total.buffer > 0
+      || state.offBusiness.total.double > 0;
+
+    if (hasHourly) {
+      rows.push({ label: "安親", sectionHead: true });
+      if (state.overtime.countsAsExtraDay) {
+        rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily) });
+      } else if (state.overtime.normal > 0) {
+        rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
+      }
+      if (state.offBusiness.total.buffer > 0)
+        rows.push({ label: `非營業附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly) });
+      if (state.offBusiness.total.double > 0)
+        rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) });
     }
-    if (state.offBusiness.total.buffer > 0)
-      rows.push({ label: `非營業附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly) });
-    if (state.offBusiness.total.double > 0)
-      rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) });
   }
 
   // Add-ons per dog
@@ -298,9 +311,12 @@ function renderBreakdown() {
   rows.push({ label: "總計", value: fmt(state.finalPrice), total: true });
 
   breakdownEl.innerHTML = `<div class="breakdown-title">費用明細</div>` +
-    rows.map(r => `<div class="breakdown-row${r.sub ? " sub" : ""}${r.total ? " total-row" : ""}">
-      <span>${r.label}</span>${r.value ? `<span class="breakdown-value">${r.value}</span>` : ""}
-    </div>`).join("");
+    rows.map(r => {
+      if (r.sectionHead) return `<div class="breakdown-section-head">${r.label}</div>`;
+      return `<div class="breakdown-row${r.sub ? " sub" : ""}${r.total ? " total-row" : ""}">
+        <span>${r.label}</span>${r.value ? `<span class="breakdown-value">${r.value}</span>` : ""}
+      </div>`;
+    }).join("");
 
   breakdownEl.classList.remove("hidden");
 }

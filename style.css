@@ -466,9 +466,22 @@ input[type="time"]:focus {
   color: var(--text-mid);
   font-size: 0.88rem;
   margin-bottom: 0.75rem;
-  text-align: center;
+  text-align: left;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.breakdown-section-head {
+  font-weight: 700;
+  color: var(--text-mid);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--gold);
 }
 
 .breakdown-row {
