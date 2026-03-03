@@ -249,30 +249,29 @@ function renderBreakdown() {
   }
 
   const { daily, hourly } = getCombinedRates();
-  const count = state.dogs.length;
-  const rows  = [];
+  const count   = state.dogs.length;
+  const isPlanB = state.planType === "B";
+  const rows    = [];
 
-  // Rate summary
+  // Rate summary — type:'rate' rows render with separate daily/hourly value columns
   if (count > 1) {
-    rows.push({ label: "住宿費率（合計）", value: `${fmt(daily)}/天　${fmt(hourly)}/時` });
+    rows.push({ type: "rate", label: "住宿費率（合計）", daily: fmt(daily), hourly: fmt(hourly) });
     for (let i = 0; i < count; i++) {
       const sz = state.dogs[i].size;
-      rows.push({ label: `第 ${i+1} 隻（${sizeLabel[sz]}）`, value: `${fmt(dailyRate[sz])}/天　${fmt(hourlyRate[sz])}/時`, sub: true });
+      rows.push({ type: "rate", label: `第 ${i+1} 隻（${sizeLabel[sz]}）`, daily: fmt(dailyRate[sz]), hourly: fmt(hourlyRate[sz]), sub: true });
     }
   } else {
     const sz = state.dogs[0].size;
-    rows.push({ label: `狗狗體型（${sizeLabel[sz]}）`, value: `${fmt(daily)}/天　${fmt(hourly)}/時` });
+    rows.push({ type: "rate", label: `狗狗體型（${sizeLabel[sz]}）`, daily: fmt(daily), hourly: fmt(hourly) });
   }
 
   // Plan A
   if (state.planType === "A") {
-    rows.push({ label: "寄宿費用", sectionHead: true });
     rows.push({ label: `基本住宿 × ${state.days} 天`, value: fmt(daily * state.days) });
   }
 
   // Plan B
   if (state.planType === "B") {
-    rows.push({ label: "寄宿費用", sectionHead: true });
     rows.push({ label: `基本住宿 × ${state.days} 晚`, value: fmt(daily * state.days) });
 
     const hasHourly = state.overtime.countsAsExtraDay
@@ -297,7 +296,7 @@ function renderBreakdown() {
   // Add-ons per dog
   const hasAddons = state.dogs.some(d => d.walks > 0 || d.sleeps > 0);
   if (hasAddons) {
-    rows.push({ label: "加購服務", value: "" });
+    rows.push({ label: "加購服務", sectionHead: true });
     for (let i = 0; i < count; i++) {
       const d = state.dogs[i];
       const label = count === 1 ? "" : `第 ${i+1} 隻　`;
@@ -310,13 +309,37 @@ function renderBreakdown() {
 
   rows.push({ label: "總計", value: fmt(state.finalPrice), total: true });
 
-  breakdownEl.innerHTML = `<div class="breakdown-title">費用明細</div>` +
-    rows.map(r => {
-      if (r.sectionHead) return `<div class="breakdown-section-head">${r.label}</div>`;
-      return `<div class="breakdown-row${r.sub ? " sub" : ""}${r.total ? " total-row" : ""}">
-        <span>${r.label}</span>${r.value ? `<span class="breakdown-value">${r.value}</span>` : ""}
+  // Title row: column headers sit above the rate value columns
+  const colHeaders = isPlanB
+    ? `<div class="breakdown-col-headers"><span>寄宿費用</span><span>安親</span></div>`
+    : `<div class="breakdown-col-headers single"><span>寄宿費用</span></div>`;
+
+  const titleHtml = `<div class="breakdown-title-row">
+    <span class="breakdown-title">費用明細</span>
+    ${colHeaders}
+  </div>`;
+
+  breakdownEl.innerHTML = titleHtml + rows.map(r => {
+    if (r.sectionHead) return `<div class="breakdown-section-head">${r.label}</div>`;
+
+    if (r.type === "rate") {
+      // Two-column rate row aligned with column headers above
+      const hourlyHtml = isPlanB
+        ? `<span class="breakdown-value">${r.hourly}/時</span>`
+        : "";
+      return `<div class="breakdown-row${r.sub ? " sub" : ""}">
+        <span>${r.label}</span>
+        <div class="rate-values${isPlanB ? "" : " single"}">
+          <span class="breakdown-value">${r.daily}/天</span>
+          ${hourlyHtml}
+        </div>
       </div>`;
-    }).join("");
+    }
+
+    return `<div class="breakdown-row${r.sub ? " sub" : ""}${r.total ? " total-row" : ""}">
+      <span>${r.label}</span>${r.value ? `<span class="breakdown-value">${r.value}</span>` : ""}
+    </div>`;
+  }).join("");
 
   breakdownEl.classList.remove("hidden");
 }

@@ -465,8 +465,23 @@ input[type="time"]:focus {
   font-weight: 700;
   color: var(--text-mid);
   font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.breakdown-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   margin-bottom: 0.75rem;
-  text-align: left;
+}
+
+.breakdown-col-headers {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -528,4 +543,24 @@ input[type="time"]:focus {
   #resultPanel { padding: 1.5rem; }
   #finalPrice { font-size: 2rem; }
   .plan-cards { grid-template-columns: 1fr; }
+}
+/* ── Rate value columns (aligned with breakdown-col-headers) ── */
+.rate-values {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.rate-values .breakdown-value {
+  min-width: 4.5rem;
+  text-align: right;
+}
+
+.breakdown-col-headers span {
+  min-width: 4.5rem;
+  text-align: right;
+}
+
+.rate-values.single .breakdown-value,
+.breakdown-col-headers.single span {
+  min-width: unset;
 }
