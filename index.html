@@ -1,121 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>小毛宅狗狗旅館住宿費用試算系統</title>
-<link rel="stylesheet" href="./style.css"/>
-<script defer src="./app.js"></script>
-</head>
-<body>
-<h1>小毛宅狗狗旅館住宿費用試算系統</h1>
-<form id="priceForm">
-
-  <fieldset>
-    <legend>請選擇住宿方案：</legend>
-    <div class="included-services">
-      <div class="included-services-title">A 方案及 B 方案皆包含以下免費服務：</div>
-      <ul class="included-list">
-        <li>早晚 2 次散步</li>
-        <li>配合飼主要求（刷牙／點眼藥水／餵藥⋯）</li>
-        <li>A 方案（滿 4 天）／ B 方案（滿 4 晚）提供免費接送服務</li>
-      </ul>
-    </div>
-
-    <div class="plan-cards">
-
-      <label class="plan-card" id="cardA" for="planA">
-        <div class="plan-card-header">
-          <input type="radio" name="planType" id="planA" value="A"/>
-          <span class="plan-title">A 方案｜天數制</span>
-          <span class="plan-badge">高度彈性</span>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小毛宅狗狗旅館住宿費用試算系統</title>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.png">
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <h1>小毛宅狗狗旅館住宿費用試算系統</h1>
+    <form id="priceForm">
+      <fieldset>
+        <legend>請選擇住宿方案：</legend>
+        <div class="included-services">
+          <div class="included-services-title">
+            A 方案及 B 方案皆包含以下免費服務：
+          </div>
+          <ul class="included-list">
+            <li>早晚 2 次散步</li>
+            <li>配合飼主要求（刷牙／點眼藥水／餵藥⋯）</li>
+            <li>A 方案（滿 4 天）／ B 方案（滿 4 晚）提供免費接送服務</li>
+          </ul>
         </div>
-        <ul class="plan-points">
-          <li>以「照護天數」計算住宿費用</li>
-          <li>可配合主人的時間安排</li>
-          <li class="plan-example">例: 01/01 ～ 01/03 → 3 天（01. 02. 03.）</li>
-        </ul>
-        <div class="plan-section-title">📣 時間彈性說明</div>
-        <ul class="plan-points">
-          <li>營業時間 10:00 am – 20:00 pm 以外仍可安排接送／入住／退房服務</li>
-          <li>若超過晚上 12:00，則需加一天費用，隔天安排回家</li>
-        </ul>
-        <div class="plan-flag">🚩 適合行程不固定、交通可能延誤，希望以狗狗作息為優先考量的選擇</div>
-      </label>
 
-      <label class="plan-card" id="cardB" for="planB">
-        <div class="plan-card-header">
-          <input type="radio" name="planType" id="planB" value="B"/>
-          <span class="plan-title">B 方案｜24 小時制</span>
-          <span class="plan-badge">準時限定</span>
+        <div class="plan-cards">
+          <label class="plan-card" id="cardA" for="planA">
+            <div class="plan-card-header">
+              <input type="radio" name="planType" id="planA" value="A" />
+              <span class="plan-title">A 方案｜天數制</span>
+              <span class="plan-badge">高度彈性</span>
+            </div>
+            <ul class="plan-points">
+              <li>以「照護天數」計算住宿費用</li>
+              <li>可配合主人的時間安排</li>
+              <li class="plan-example">
+                例: 01/01 ～ 01/03 → 3 天（01. 02. 03.）
+              </li>
+            </ul>
+            <div class="plan-section-title">📣 時間彈性說明</div>
+            <ul class="plan-points">
+              <li>
+                營業時間 10:00 am – 20:00 pm 以外仍可安排接送／入住／退房服務
+              </li>
+              <li>若超過晚上 12:00，則需加一天費用，隔天安排回家</li>
+            </ul>
+            <div class="plan-flag">
+              🚩 適合行程不固定、交通可能延誤，希望以狗狗作息為優先考量的選擇
+            </div>
+          </label>
+
+          <label class="plan-card" id="cardB" for="planB">
+            <div class="plan-card-header">
+              <input type="radio" name="planType" id="planB" value="B" />
+              <span class="plan-title">B 方案｜24 小時制</span>
+              <span class="plan-badge">準時限定</span>
+            </div>
+            <ul class="plan-points">
+              <li>以「晚」計算住宿費用</li>
+              <li>狗狗幾點入住，幾點退房</li>
+              <li class="plan-example">
+                例: 01/01 15:00 ～ 01/03 15:00 → 2 晚<br />
+              </li>
+            </ul>
+            <div class="plan-section-title">📣 時間規範說明</div>
+            <ul class="plan-points">
+              <li>
+                「僅限」營業時間內（10:00 am – 20:00
+                pm）安排接送／入住／退房服務
+              </li>
+            </ul>
+            <div class="plan-section-title">📣 超時計費說明</div>
+            <ul class="plan-points">
+              <li>營業時段內：收取安親費用</li>
+              <li>
+                非營業時段：超時／接送／入住 / 退房等服務收取「2倍」安親費用
+              </li>
+              <li>營業時間前後各一小時免雙倍費用緩衝</li>
+            </ul>
+            <div class="plan-flag">
+              🚩 適合行程非常確定、能準時接送，並希望用「晚」計算住宿的飼主
+            </div>
+          </label>
         </div>
-        <ul class="plan-points">
-          <li>以「晚」計算住宿費用</li>
-          <li>狗狗幾點入住，幾點退房</li>
-          <li class="plan-example">例: 01/01 15:00 ～ 01/03 15:00 → 2 晚<br></li>
-        </ul>
-        <div class="plan-section-title">📣 時間規範說明</div>
-        <ul class="plan-points">
-          <li>「僅限」營業時間內（10:00 am – 20:00 pm）安排接送／入住／退房服務</li>
-        </ul>
-        <div class="plan-section-title">📣 超時計費說明</div>
-        <ul class="plan-points">
-          <li>營業時段內：收取安親費用</li>
-          <li>非營業時段：超時／接送／入住 / 退房等服務收取「2倍」安親費用</li>
-          <li>營業時間前後各一小時免雙倍費用緩衝</li>
-        </ul>
-        <div class="plan-flag">🚩 適合行程非常確定、能準時接送，並希望用「晚」計算住宿的飼主</div>
-      </label>
+      </fieldset>
 
+      <div class="senior-dog-notice">
+        10 歲以上老犬請直接聯繫官方 Line，我們將為您安排個人化服務。
+      </div>
+
+      <div>
+        <label for="dogCount">狗狗數量：</label>
+        <select class="dropDown" name="dogCount" id="dogCount">
+          <option value="1">1 隻</option>
+          <option value="2">2 隻</option>
+          <option value="3">3 隻</option>
+          <option value="4">4 隻</option>
+          <option value="5">5 隻</option>
+          <option value="6">6 隻</option>
+          <option value="7">7 隻</option>
+          <option value="8">8 隻</option>
+          <option value="9">9 隻</option>
+          <option value="10">10 隻</option>
+        </select>
+      </div>
+
+      <div id="dogSizesContainer"></div>
+
+      <div id="dateTimeSelection" class="hidden">
+        <div>
+          <label for="startDate">入住日期：</label>
+          <input type="date" id="startDate" />
+          <span id="startTimeSelection" class="hidden">
+            <label for="startTime">入住時間：</label>
+            <input type="time" id="startTime" />
+          </span>
+        </div>
+        <div>
+          <label for="endDate">退房日期：</label>
+          <input type="date" id="endDate" />
+          <span id="endTimeSelection" class="hidden">
+            <label for="endTime">退房時間：</label>
+            <input type="time" id="endTime" />
+          </span>
+        </div>
+      </div>
+    </form>
+
+    <div id="resultPanel">
+      <div class="result-label">本次住宿預估費用：</div>
+      <div id="finalPrice">--</div>
+      <div id="breakdown" class="breakdown hidden"></div>
     </div>
-  </fieldset>
-
-  <div class="senior-dog-notice">
-    10 歲以上老犬請直接聯繫官方 Line，我們將為您安排個人化服務。
-  </div>
-
-  <div>
-    <label for="dogCount">狗狗數量：</label>
-    <select class="dropDown" name="dogCount" id="dogCount">
-      <option value="1">1 隻</option>
-      <option value="2">2 隻</option>
-      <option value="3">3 隻</option>
-      <option value="4">4 隻</option>
-      <option value="5">5 隻</option>
-      <option value="6">6 隻</option>
-      <option value="7">7 隻</option>
-      <option value="8">8 隻</option>
-      <option value="9">9 隻</option>
-      <option value="10">10 隻</option>
-    </select>
-  </div>
-
-  <div id="dogSizesContainer"></div>
-
-  <div id="dateTimeSelection" class="hidden">
-    <div>
-      <label for="startDate">入住日期：</label>
-      <input type="date" id="startDate"/>
-      <span id="startTimeSelection" class="hidden">
-        <label for="startTime">入住時間：</label>
-        <input type="time" id="startTime"/>
-      </span>
-    </div>
-    <div>
-      <label for="endDate">退房日期：</label>
-      <input type="date" id="endDate"/>
-      <span id="endTimeSelection" class="hidden">
-        <label for="endTime">退房時間：</label>
-        <input type="time" id="endTime"/>
-      </span>
-    </div>
-  </div>
-</form>
-
-<div id="resultPanel">
-  <div class="result-label">本次住宿預估費用：</div>
-  <div id="finalPrice">--</div>
-  <div id="breakdown" class="breakdown hidden"></div>
-</div>
-</body>
+  </body>
 </html>
