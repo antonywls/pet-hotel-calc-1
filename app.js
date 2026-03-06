@@ -165,8 +165,8 @@ function calculateOvertime() {
     + ov((ClosingHour + 24) * 60, 48 * 60);
 
   state.overtime.zeroed = Math.ceil(zeroedMin / 30) / 2;
-  state.overtime.normal = Math.ceil((em - sm - zeroedMin) / 30) / 2;
-  state.overtime.base   = state.overtime.zeroed + state.overtime.normal;
+  state.overtime.normal = Math.ceil((em - sm) / 30) / 2;
+  state.overtime.base   = state.overtime.normal;
   state.overtime.countsAsExtraDay =
     state.overtime.normal * hourly >= daily
     || (state.startHour > state.endHour && state.endHour >= OvernightPivot);
@@ -395,6 +395,8 @@ function renderFinal() {
 
   renderBreakdown();
 }
+
+
 
 // ── Init ──────────────────────────────────────────────────────
 renderDogCards();
