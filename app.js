@@ -288,10 +288,34 @@ function renderBreakdown() {
       } else if (state.overtime.normal > 0) {
         rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
       }
-      if (state.offBusiness.total.buffer > 0)
+
+      if(state.offBusiness.dropOff.base>0){
+        rows.push({ label: `入住非營業附加（ ${state.offBusiness.dropOff.base} 時）`})
+        if(state.offBusiness.dropOff.buffer > 0){
+          rows.push({ label: `單倍 × ${state.offBusiness.dropOff.buffer} 時`, value: fmt(state.offBusiness.dropOff.buffer * hourly), sub: true});
+        }
+        if(state.offBusiness.dropOff.double > 0){
+          rows.push({ label: `雙倍 × ${state.offBusiness.dropOff.double} 時`, value: fmt(state.offBusiness.dropOff.double * hourly * 2), sub: true});
+        }
+      }
+
+      if(state.offBusiness.pickUp.base>0){
+        rows.push({ label: `退房非營業附加（ ${state.offBusiness.pickUp.base} 時）`})
+        if(state.offBusiness.pickUp.buffer > 0){
+          rows.push({ label: `單倍 × ${state.offBusiness.pickUp.buffer} 時`, value: fmt(state.offBusiness.pickUp.buffer * hourly), sub: true});
+        }
+        if(state.offBusiness.pickUp.double > 0){
+          rows.push({ label: `雙倍 × ${state.offBusiness.pickUp.double} 時`, value: fmt(state.offBusiness.pickUp.double * hourly * 2), sub: true});
+        }
+      }
+
+      /* if (state.offBusiness.total.buffer > 0)
         rows.push({ label: `非營業附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly) });
       if (state.offBusiness.total.double > 0)
-        rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) });
+        rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) }); */
+
+
+
     }
   }
 
