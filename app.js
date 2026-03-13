@@ -53,6 +53,8 @@ const endTimeSelection   = document.getElementById("endTimeSelection");
 const breakdownEl        = document.getElementById("breakdown");
 const cardA              = document.getElementById("cardA");
 const cardB              = document.getElementById("cardB");
+const startTimeWarningEl = document.getElementById("startTimeWarning");
+const endTimeWarningEl   = document.getElementById("endTimeWarning");
 
 // ── Dog cards renderer ─────────────────────────────────────────
 function renderDogCards() {
@@ -344,6 +346,24 @@ function renderBreakdown() {
   breakdownEl.classList.remove("hidden");
 }
 
+function renderWarnings(){
+  if(state.offBusiness.dropOff.base > 0){
+    startTimeWarningEl.classList.remove("hidden");
+    startTimeWarningEl.textContent = `您選擇的入住時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.dropOff.base} 小時的非營業時間加成費用。`;
+  } else {
+    startTimeWarningEl.classList.add("hidden");
+    startTimeWarningEl.textContent = "";
+  }
+
+  if(state.offBusiness.pickUp.base > 0){
+    endTimeWarningEl.classList.remove("hidden");
+    endTimeWarningEl.textContent = `您選擇的退房時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.pickUp.base} 小時的非營業時間加成費用。`;
+  } else {
+    endTimeWarningEl.classList.add("hidden");
+    endTimeWarningEl.textContent = "";
+  }
+}
+
 // ── Plan card highlight ────────────────────────────────────────
 function updatePlanCards() {
   cardA.classList.toggle("selected", state.planType === "A");
@@ -384,6 +404,7 @@ function renderFinal() {
   if (state.planType === "B") {
     startTimeSelection.classList.remove("hidden");
     endTimeSelection.classList.remove("hidden");
+    renderWarnings();
   } else {
     startTimeSelection.classList.add("hidden");
     endTimeSelection.classList.add("hidden");

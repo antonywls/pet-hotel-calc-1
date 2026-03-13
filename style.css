@@ -13,6 +13,7 @@
   --text-mid: #34495e;
   --text-muted: #7f8c8d;
   --border: #e1e8ed;
+  --warning: #7f0c01;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -402,6 +403,15 @@ legend {
   color: var(--text-mid);
   font-weight: 400;
   font-size: 0.95rem;
+}
+
+#startTimeWarning,
+#endTimeWarning{
+  padding-top: 0.9rem;
+  padding-bottom: 1rem;
+  color: var(--warning);
+  font-weight: 400;
+  font-size: 0.8rem;
 }
 
 input[type="date"],

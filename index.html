@@ -52,7 +52,7 @@
 
           <label class="plan-card" id="cardB" for="planB">
             <div class="plan-card-header">
-              <input type="radio" name="planType" id="planB" value="B" />
+              <input type="radio" name="planType" id="planB" value="B"/>
               <span class="plan-title">B 方案｜24 小時制</span>
               <span class="plan-badge">準時限定</span>
             </div>
@@ -93,7 +93,7 @@
         <label for="dogCount">狗狗數量：</label>
         <select class="dropDown" name="dogCount" id="dogCount">
           <option value="1">1 隻</option>
-          <option value="2" >2 隻</option>
+          <option value="2">2 隻</option>
           <option value="3">3 隻</option>
           <option value="4">4 隻</option>
           <option value="5">5 隻</option>
@@ -110,18 +110,20 @@
       <div id="dateTimeSelection" class="hidden">
         <div>
           <label for="startDate">入住日期：</label>
-          <input type="date" id="startDate" />
+          <input type="date" id="startDate"/>
           <span id="startTimeSelection" class="hidden">
             <label for="startTime">入住時間：</label>
-            <input type="time" id="startTime" />
+            <input type="time" id="startTime"/>
+            <div id="startTimeWarning"></div>
           </span>
         </div>
         <div>
           <label for="endDate">退房日期：</label>
-          <input type="date" id="endDate" />
+          <input type="date" id="endDate"/>
           <span id="endTimeSelection" class="hidden">
             <label for="endTime">退房時間：</label>
-            <input type="time" id="endTime" />
+            <input type="time" id="endTime"/>
+            <div id="endTimeWarning">djkdls</div>
           </span>
         </div>
       </div>
