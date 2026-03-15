@@ -55,6 +55,7 @@ const cardA              = document.getElementById("cardA");
 const cardB              = document.getElementById("cardB");
 const startTimeWarningEl = document.getElementById("startTimeWarning");
 const endTimeWarningEl   = document.getElementById("endTimeWarning");
+const durationNoticeEl   = document.getElementById("durationNotice");
 
 // ── Dog cards renderer ─────────────────────────────────────────
 function renderDogCards() {
@@ -388,6 +389,49 @@ function renderWarnings(){
   }
 }
 
+function renderDurationNotice(){
+  if(state.planType === "B" && state.finalPrice > 0){
+    durationNoticeEl.classList.remove("hidden");
+
+    const totalHours   = state.days * 24 + state.overtime.normal;
+    const totalDays    = state.overtime.countsAsExtraDay ? state.days + 1 : state.days;
+    const totalOvertime = state.overtime.countsAsExtraDay ? 0 : state.overtime.normal;
+
+    if(state.overtime.countsAsExtraDay){
+      durationNoticeEl.innerHTML = `
+        <div class="duration-notice-title">⏱ 住宿時數計算</div>
+        <div class="duration-notice-summary">
+          本次住宿總時數為 <span class="durationNotice-highlight">${totalHours} 小時</span>，
+          超時部分自動進位，合計計為 <span class="durationNotice-highlight">${totalDays} 晚</span>，無另收超時費用。
+        </div>
+        <div class="duration-equation">
+          <span class="duration-eq-value">${totalHours} 小時</span>
+          <span class="duration-eq-op">＝</span>
+          <span class="duration-eq-plain">${totalDays - 1} 晚 × 24 小時</span>
+          <span class="duration-eq-op">＋</span>
+          <span class="duration-eq-plain">${state.overtime.normal} 小時</span>
+          <span class="duration-eq-arrow">→ 進位為 ${totalDays} 晚</span>
+        </div>`;
+    } else {
+      durationNoticeEl.innerHTML = `
+        <div class="duration-notice-title">⏱ 住宿時數計算</div>
+        <div class="duration-notice-summary">
+          本次住宿總時數為 <span class="durationNotice-highlight">${totalHours} 小時</span>，
+          計為 <span class="durationNotice-highlight">${totalDays} 晚</span>
+          ${totalOvertime > 0 ? `加上 <span class="durationNotice-highlight">${totalOvertime} 小時</span> 超時費用` : '，無超時費用'}。
+        </div>
+        <div class="duration-equation">
+          <span class="duration-eq-value">${totalHours} 小時</span>
+          <span class="duration-eq-op">＝</span>
+          <span class="duration-eq-plain">${totalDays} 晚 × 24 小時</span>
+          ${totalOvertime > 0 ? `<span class="duration-eq-op">＋</span><span class="duration-eq-value">${totalOvertime} 小時超時</span>` : ''}
+        </div>`;
+    }
+  } else {
+    durationNoticeEl.classList.add("hidden");
+  }
+}
+
 // ── Plan card highlight ────────────────────────────────────────
 function updatePlanCards() {
   cardA.classList.toggle("selected", state.planType === "A");
@@ -429,6 +473,7 @@ function renderFinal() {
     startTimeSelection.classList.remove("hidden");
     endTimeSelection.classList.remove("hidden");
     renderWarnings();
+
   } else {
     startTimeSelection.classList.add("hidden");
     endTimeSelection.classList.add("hidden");
@@ -437,6 +482,8 @@ function renderFinal() {
   finalPriceEl.textContent = (state.finalPrice > 0 && state.inputsValid)
     ? `$${state.finalPrice.toFixed(0)}`
     : "--";
+
+  renderDurationNotice();
 
   renderBreakdown();
 }

@@ -111,6 +111,66 @@ legend {
   font-weight: 400;
 }
 
+#durationNotice {
+  background: var(--gold-light);
+  border: 1px solid var(--gold-border);
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+}
+
+.duration-notice-title {
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 0.88rem;
+  margin-bottom: 0.45rem;
+}
+
+.duration-notice-summary {
+  line-height: 1.6;
+  margin-bottom: 0.55rem;
+}
+
+.durationNotice-highlight {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.duration-equation {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  background: white;
+  border: 1px solid var(--gold-border);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.84rem;
+}
+
+.duration-eq-value {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.duration-eq-plain {
+  color: var(--text-mid);
+}
+
+.duration-eq-op {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.duration-eq-arrow {
+  color: var(--gold);
+  font-weight: 700;
+  margin-left: 0.2rem;
+}
+
 /* ── Plan cards ── */
 .plan-cards {
   display: grid;
