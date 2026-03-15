@@ -256,7 +256,8 @@ function renderBreakdown() {
   const isPlanB = state.planType === "B";
   const rows    = [];
 
-  // Rate summary — type:'rate' rows render with separate daily/hourly value columns
+  // ── Section 1: Rates ──
+  rows.push({ label: "費率", sectionHead: true });
   if (count > 1) {
     rows.push({ type: "rate", label: "住宿費率（合計）", daily: fmt(daily), hourly: fmt(hourly) });
     for (let i = 0; i < count; i++) {
@@ -268,59 +269,40 @@ function renderBreakdown() {
     rows.push({ type: "rate", label: `狗狗體型（${sizeLabel[sz]}）`, daily: fmt(daily), hourly: fmt(hourly) });
   }
 
-  // Plan A
+  // ── Section 2: Stay fee (base + overtime) ──
+  rows.push({ label: "住宿費用", sectionHead: true });
   if (state.planType === "A") {
     rows.push({ label: `基本住宿 × ${state.days} 天`, value: fmt(daily * state.days) });
   }
-
-  // Plan B
-  if (state.planType === "B") {
+  if (isPlanB) {
     rows.push({ label: `基本住宿 × ${state.days} 晚`, value: fmt(daily * state.days) });
-
-    const hasHourly = state.overtime.countsAsExtraDay
-      || state.overtime.normal > 0
-      || state.offBusiness.total.buffer > 0
-      || state.offBusiness.total.double > 0;
-
-    if (hasHourly) {
-      rows.push({ label: "安親", sectionHead: true });
-      if (state.overtime.countsAsExtraDay) {
-        rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily) });
-      } else if (state.overtime.normal > 0) {
-        rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
-      }
-
-      if(state.offBusiness.dropOff.base>0){
-        rows.push({ label: `入住非營業附加（ ${state.offBusiness.dropOff.base} 時）`})
-        if(state.offBusiness.dropOff.buffer > 0){
-          rows.push({ label: `單倍 × ${state.offBusiness.dropOff.buffer} 時`, value: fmt(state.offBusiness.dropOff.buffer * hourly), sub: true});
-        }
-        if(state.offBusiness.dropOff.double > 0){
-          rows.push({ label: `雙倍 × ${state.offBusiness.dropOff.double} 時`, value: fmt(state.offBusiness.dropOff.double * hourly * 2), sub: true});
-        }
-      }
-
-      if(state.offBusiness.pickUp.base>0){
-        rows.push({ label: `退房非營業附加（ ${state.offBusiness.pickUp.base} 時）`})
-        if(state.offBusiness.pickUp.buffer > 0){
-          rows.push({ label: `單倍 × ${state.offBusiness.pickUp.buffer} 時`, value: fmt(state.offBusiness.pickUp.buffer * hourly), sub: true});
-        }
-        if(state.offBusiness.pickUp.double > 0){
-          rows.push({ label: `雙倍 × ${state.offBusiness.pickUp.double} 時`, value: fmt(state.offBusiness.pickUp.double * hourly * 2), sub: true});
-        }
-      }
-
-      /* if (state.offBusiness.total.buffer > 0)
-        rows.push({ label: `非營業附加（單倍）× ${state.offBusiness.total.buffer} 時`, value: fmt(state.offBusiness.total.buffer * hourly) });
-      if (state.offBusiness.total.double > 0)
-        rows.push({ label: `非營業附加（雙倍）× ${state.offBusiness.total.double} 時`, value: fmt(state.offBusiness.total.double * hourly * 2) }); */
-
-
-
+    if (state.overtime.countsAsExtraDay) {
+      rows.push({ label: "超時費用（以加收一天計）", value: fmt(daily) });
+    } else if (state.overtime.normal > 0) {
+      rows.push({ label: `超時費用 × ${state.overtime.normal} 時`, value: fmt(state.overtime.normal * hourly) });
     }
   }
 
-  // Add-ons per dog
+  // ── Section 3: Off-business fees (Plan B only) ──
+  if (isPlanB && state.offBusiness.total.base > 0) {
+    rows.push({ label: "非營業時段附加費", sectionHead: true });
+    if (state.offBusiness.dropOff.base > 0) {
+      rows.push({ label: `入住非營業附加（${state.offBusiness.dropOff.base} 時）` });
+      if (state.offBusiness.dropOff.buffer > 0)
+        rows.push({ label: `單倍 × ${state.offBusiness.dropOff.buffer} 時`, value: fmt(state.offBusiness.dropOff.buffer * hourly), sub: true });
+      if (state.offBusiness.dropOff.double > 0)
+        rows.push({ label: `雙倍 × ${state.offBusiness.dropOff.double} 時`, value: fmt(state.offBusiness.dropOff.double * hourly * 2), sub: true });
+    }
+    if (state.offBusiness.pickUp.base > 0) {
+      rows.push({ label: `退房非營業附加（${state.offBusiness.pickUp.base} 時）` });
+      if (state.offBusiness.pickUp.buffer > 0)
+        rows.push({ label: `單倍 × ${state.offBusiness.pickUp.buffer} 時`, value: fmt(state.offBusiness.pickUp.buffer * hourly), sub: true });
+      if (state.offBusiness.pickUp.double > 0)
+        rows.push({ label: `雙倍 × ${state.offBusiness.pickUp.double} 時`, value: fmt(state.offBusiness.pickUp.double * hourly * 2), sub: true });
+    }
+  }
+
+  // ── Section 4: Add-ons ──
   const hasAddons = state.dogs.some(d => d.walks > 0 || d.sleeps > 0);
   if (hasAddons) {
     rows.push({ label: "加購服務", sectionHead: true });
@@ -336,21 +318,15 @@ function renderBreakdown() {
 
   rows.push({ label: "總計", value: fmt(state.finalPrice), total: true });
 
-  // Title row: column headers sit above the rate value columns
-  const colHeaders = isPlanB
-    ? `<div class="breakdown-col-headers"><span>寄宿費用</span><span>安親</span></div>`
-    : `<div class="breakdown-col-headers single"><span>寄宿費用</span></div>`;
-
   const titleHtml = `<div class="breakdown-title-row">
     <span class="breakdown-title">費用明細</span>
-    ${colHeaders}
+    ${isPlanB ? `<div class="breakdown-col-headers"><span>費用</span></div>` : ""}
   </div>`;
 
   breakdownEl.innerHTML = titleHtml + rows.map(r => {
     if (r.sectionHead) return `<div class="breakdown-section-head">${r.label}</div>`;
 
     if (r.type === "rate") {
-      // Two-column rate row aligned with column headers above
       const hourlyHtml = isPlanB
         ? `<span class="breakdown-value">${r.hourly}/時</span>`
         : "";
