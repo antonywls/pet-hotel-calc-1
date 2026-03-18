@@ -287,14 +287,14 @@ function renderBreakdown() {
   if (isPlanB && state.offBusiness.total.base > 0) {
     rows.push({ label: "非營業時段附加費", sectionHead: true });
     if (state.offBusiness.dropOff.base > 0) {
-      rows.push({ label: `入住非營業附加（${state.offBusiness.dropOff.base} 時）` });
+      rows.push({ label: `入住非營業加班費（${state.offBusiness.dropOff.base} 時）` });
       if (state.offBusiness.dropOff.buffer > 0)
         rows.push({ label: `單倍 × ${state.offBusiness.dropOff.buffer} 時`, value: fmt(state.offBusiness.dropOff.buffer * hourly), sub: true });
       if (state.offBusiness.dropOff.double > 0)
         rows.push({ label: `雙倍 × ${state.offBusiness.dropOff.double} 時`, value: fmt(state.offBusiness.dropOff.double * hourly * 2), sub: true });
     }
     if (state.offBusiness.pickUp.base > 0) {
-      rows.push({ label: `退房非營業附加（${state.offBusiness.pickUp.base} 時）` });
+      rows.push({ label: `退房非營業加班費（${state.offBusiness.pickUp.base} 時）` });
       if (state.offBusiness.pickUp.buffer > 0)
         rows.push({ label: `單倍 × ${state.offBusiness.pickUp.buffer} 時`, value: fmt(state.offBusiness.pickUp.buffer * hourly), sub: true });
       if (state.offBusiness.pickUp.double > 0)
@@ -350,7 +350,7 @@ function renderBreakdown() {
 function renderWarnings(){
   if(state.offBusiness.dropOff.base > 0){
     startTimeWarningEl.classList.remove("hidden");
-    startTimeWarningEl.textContent = `您選擇的入住時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.dropOff.base} 小時的非營業時間加成費用。`;
+    startTimeWarningEl.textContent = `您選擇的入住時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.dropOff.base} 小時的非營業加班費用。`;
   } else {
     startTimeWarningEl.classList.add("hidden");
     startTimeWarningEl.textContent = "";
@@ -358,7 +358,7 @@ function renderWarnings(){
 
   if(state.offBusiness.pickUp.base > 0){
     endTimeWarningEl.classList.remove("hidden");
-    endTimeWarningEl.textContent = `您選擇的退房時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.pickUp.base} 小時的非營業時間加成費用。`;
+    endTimeWarningEl.textContent = `您選擇的退房時間為非營業時段（10:00 am – 20:00 pm），因此將額外收取 ${state.offBusiness.pickUp.base} 小時的非營業加班費用。`;
   } else {
     endTimeWarningEl.classList.add("hidden");
     endTimeWarningEl.textContent = "";
